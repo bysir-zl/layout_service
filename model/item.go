@@ -63,7 +63,7 @@ func UpdateItem(id int64, s *Item) (error) {
 		return ErrNotFind.Append("没找到item")
 	}
 
-	col := []string{"data","design"}
+	col := []string{"data", "design"}
 	_, err = engine.ID(s.Id).Cols(col...).Update(s)
 	if err != nil {
 		return err
@@ -78,6 +78,20 @@ func CreateItem(s *Item) (error) {
 		return ErrBadParams.Append("type can't be empty")
 	}
 	_, err := engine.Insert(s)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// 添加item
+func CreateItems(s []*Item) (error) {
+	it := make([]interface{}, len(s))
+	for i := range s {
+		it[i] = s[i]
+	}
+	_, err := engine.Insert(it...)
 	if err != nil {
 		return err
 	}

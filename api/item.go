@@ -6,7 +6,7 @@ import (
 )
 
 // 添加元素
-func createdItem(ctx *gin.Context) interface{} {
+func addItem(ctx *gin.Context) interface{} {
 	//uid := GetUid(ctx)
 
 	s := model.Item{}
@@ -23,6 +23,22 @@ func createdItem(ctx *gin.Context) interface{} {
 }
 
 // 添加元素
+func addItems(ctx *gin.Context) interface{} {
+	//uid := GetUid(ctx)
+	s := []*model.Item{}
+	err := ctx.Bind(&s)
+	if err != nil {
+		return model.ErrBadParams.Append(err.Error())
+	}
+	err = model.CreateItems(s)
+	if err != nil {
+		return err
+	}
+
+	return s
+}
+
+// 添加元素
 func updateItem(ctx *gin.Context) interface{} {
 	//uid := GetUid(ctx)
 
@@ -31,7 +47,7 @@ func updateItem(ctx *gin.Context) interface{} {
 	if err != nil {
 		return model.ErrBadParams.Append(err.Error())
 	}
-	err = model.UpdateItem(s.Id,&s)
+	err = model.UpdateItem(s.Id, &s)
 	if err != nil {
 		return err
 	}
