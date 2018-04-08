@@ -1,20 +1,18 @@
 package model
 
-// Item
-type Item struct {
+// Component
+type Component struct {
 	Id     int64                  `json:"id" xorm:"not null pk autoincr INT(10)"`
-	PageId int64                  `json:"page_id,omitempty" xorm:"INT(11)"`
-	SiteId int64                  `json:"site_id,omitempty" xorm:"INT(11)"`
+	Type   string                 `json:"type" xorm:"varchar(20)"`
 	Data   map[string]interface{} `json:"data" xorm:"json"`
 	Design map[string]interface{} `json:"design" xorm:"json"` // 暂时放map, 后面再优化性能
-	Type   string                 `json:"type" xorm:"varchar(20)"`
 
 	CreatedAt int64 `json:"created_at" xorm:"int(11) created"`
 	UpdatedAt int64 `json:"updated_at" xorm:"int(11) updated"`
 }
 
-func GetItem(id int64) (bool, *Item, error) {
-	item := Item{}
+func GetComponent(id int64) (bool, *Component, error) {
+	item := Component{}
 	exist, err := engine.ID(id).Get(&item)
 	if err != nil {
 		return false, nil, err
@@ -24,8 +22,11 @@ func GetItem(id int64) (bool, *Item, error) {
 }
 
 // 根据多个id获取item
-func GetItemByIds(ids []int64) (map[int64]*Item, error) {
-	items := map[int64]*Item{}
+func GetComponentByIds(ids []int64) (map[int64]*Component, error) {
+	items := map[int64]*Component{}
+	if len(ids)==0{
+		return items,nil
+	}
 	err := engine.In("id", ids).Find(&items)
 	if err != nil {
 		return nil, err
@@ -35,11 +36,11 @@ func GetItemByIds(ids []int64) (map[int64]*Item, error) {
 }
 
 // 删除Item
-func DelItem(id int64) (error) {
+func DelComponent(id int64) (error) {
 	if id == 0 {
 		return ErrBadParams.Append("id is empty")
 	}
-	_, err := engine.ID(id).Delete(new(Item))
+	_, err := engine.ID(id).Delete(new(Component))
 	if err != nil {
 		return err
 	}
@@ -48,14 +49,14 @@ func DelItem(id int64) (error) {
 }
 
 // 更新Item
-func UpdateItem(id int64, s *Item) (error) {
+func UpdateComponent(id int64, s *Component) (error) {
 	if id == 0 {
 		return ErrBadParams.Append("id is empty")
 	}
 	if s.Type == "" {
 		return ErrBadParams.Append("Type can't be empty")
 	}
-	exist, _, err := GetItem(s.Id)
+	exist, _, err := GetComponent(s.Id)
 	if err != nil {
 		return err
 	}
@@ -73,7 +74,7 @@ func UpdateItem(id int64, s *Item) (error) {
 }
 
 // 添加item
-func CreateItem(s *Item) (error) {
+func CreateComponent(s *Component) (error) {
 	if s.Type == "" {
 		return ErrBadParams.Append("type can't be empty")
 	}
@@ -86,7 +87,7 @@ func CreateItem(s *Item) (error) {
 }
 
 // 添加item
-func CreateItems(s []*Item) (error) {
+func CreateComponents(s []*Component) (error) {
 	it := make([]interface{}, len(s))
 	for i := range s {
 		it[i] = s[i]

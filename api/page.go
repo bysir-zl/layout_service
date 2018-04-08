@@ -31,7 +31,7 @@ func getPageLayout(ctx *gin.Context) interface{} {
 	if err != nil {
 		return model.ErrBadParams.Append(err.Error())
 	}
-	l,err := model.GetLayoutPage(s.Id)
+	l, err := model.GetLayoutPage(s.Id)
 	if err != nil {
 		return err
 	}

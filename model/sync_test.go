@@ -3,7 +3,6 @@ package model
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
-	"container/heap"
 )
 
 func TestSync(t *testing.T) {
@@ -12,6 +11,4 @@ func TestSync(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log("ok")
-
-	heap.Fix()
 }

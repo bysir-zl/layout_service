@@ -10,7 +10,7 @@ func SyncAll() (err error) {
 	if err != nil {
 		return
 	}
-	err = engine.Sync2(new(User))
+	err = engine.Sync2(new(Component),new(Page),new(ComponentQuote))
 	if err != nil {
 		return
 	}

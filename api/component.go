@@ -6,15 +6,15 @@ import (
 )
 
 // 添加元素
-func addItem(ctx *gin.Context) interface{} {
+func addComponent(ctx *gin.Context) interface{} {
 	//uid := GetUid(ctx)
 
-	s := model.Item{}
+	s := model.Component{}
 	err := ctx.Bind(&s)
 	if err != nil {
 		return model.ErrBadParams.Append(err.Error())
 	}
-	err = model.CreateItem(&s)
+	err = model.CreateComponent(&s)
 	if err != nil {
 		return err
 	}
@@ -23,14 +23,14 @@ func addItem(ctx *gin.Context) interface{} {
 }
 
 // 添加元素
-func addItems(ctx *gin.Context) interface{} {
+func addComponents(ctx *gin.Context) interface{} {
 	//uid := GetUid(ctx)
-	s := []*model.Item{}
+	s := []*model.Component{}
 	err := ctx.Bind(&s)
 	if err != nil {
 		return model.ErrBadParams.Append(err.Error())
 	}
-	err = model.CreateItems(s)
+	err = model.CreateComponents(s)
 	if err != nil {
 		return err
 	}
@@ -38,16 +38,16 @@ func addItems(ctx *gin.Context) interface{} {
 	return s
 }
 
-// 添加元素
-func updateItem(ctx *gin.Context) interface{} {
+// 更新元素
+func updateComponent(ctx *gin.Context) interface{} {
 	//uid := GetUid(ctx)
 
-	s := model.Item{}
+	s := model.Component{}
 	err := ctx.Bind(&s)
 	if err != nil {
 		return model.ErrBadParams.Append(err.Error())
 	}
-	err = model.UpdateItem(s.Id, &s)
+	err = model.UpdateComponent(s.Id, &s)
 	if err != nil {
 		return err
 	}

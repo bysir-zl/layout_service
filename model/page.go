@@ -1,37 +1,25 @@
 package model
 
-import (
-	"encoding/json"
-	"log"
-)
-
 // Page
 type Page struct {
-	Id     int64  `json:"id" xorm:"not null pk autoincr INT(10)"`
-	Type   string `json:"type" xorm:"varchar(20)"`
-	Data   string `json:"data" xorm:"text"`
-	Layout string `json:"layout" xorm:"text"`
-	UserId int64  `json:"user_id" xorm:"INT(11)"`
-	SiteId int64  `json:"site_id" xorm:"INT(11)"`
+	Id     int64       `json:"id" xorm:"not null pk autoincr INT(10)"`
+	Name   string      `json:"name" xorm:"varchar(20)"`
+	Layout *LayoutItem `json:"layout" xorm:"json"`
+	UserId int64       `json:"user_id" xorm:"INT(11)"`
+	SiteId int64       `json:"site_id" xorm:"INT(11)"`
 
 	CreatedAt int64 `json:"created_at" xorm:"int(11) created"`
 	UpdatedAt int64 `json:"updated_at" xorm:"int(11) updated"`
 }
 
-type LayoutItem struct {
-	Id       int64        `json:"i"`
-	Children []LayoutItem `json:"c,omitempty"`
-	Layout   bool         `json:"layout,omitempty"`
-}
-
 func GetPage(id int64) (bool, *Page, error) {
-	Page := Page{}
-	exist, err := engine.ID(id).Get(&Page)
+	page := Page{}
+	exist, err := engine.ID(id).Get(&page)
 	if err != nil {
 		return false, nil, err
 	}
 
-	return exist, &Page, nil
+	return exist, &page, nil
 }
 
 // 根据多个id获取Page
@@ -80,64 +68,8 @@ func UpdatePage(id int64, s *Page) (error) {
 	return nil
 }
 
-type Layout struct {
-	Id      int64             `json:"id"`
-	Layout  LayoutItem        `json:"layout"`
-	Items   map[int64]*Item   `json:"items"`
-	Layouts map[int64]*Layout `json:"layouts"`
-}
-
-func collectIds(layout *LayoutItem) ([]int64, []int64) {
-	var itemIds []int64
-	var layoutIds []int64
-
-	if layout.Layout {
-		layoutIds = append(layoutIds, layout.Id)
-	} else {
-		itemIds = append(itemIds, layout.Id)
-	}
-	for _, v := range layout.Children {
-		i, l := collectIds(&v)
-		itemIds = append(itemIds, i...)
-		layoutIds = append(layoutIds, l...)
-	}
-
-	return itemIds, layoutIds
-}
-
-func GetLayoutPage(id int64) (l *Layout, err error) {
-	exist, p, err := GetPage(id)
-	if err != nil {
-		return
-	}
-	if !exist {
-		err = ErrNotFind.Append("page")
-		return
-	}
-	layout := LayoutItem{}
-	json.Unmarshal([]byte(p.Layout), &layout)
-
-	itemIds,layoutIds := collectIds(&layout)
-	items, err := GetItemByIds(itemIds)
-	if err != nil {
-		return
-	}
-
-	log.Print(layoutIds)
-	l = &Layout{
-		Id:     id,
-		Layout: layout,
-		Items:  items,
-	}
-
-	return
-}
-
 // 添加Page
 func CreatePage(s *Page) (error) {
-	if s.Type == "" {
-		return ErrBadParams.Append("type can't be empty")
-	}
 	_, err := engine.Insert(s)
 	if err != nil {
 		return err
